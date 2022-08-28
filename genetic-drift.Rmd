@@ -1,0 +1,67 @@
+---
+output:
+  html_document:
+    css: style.css
+---
+
+<font size="5"> BIO345 Evolution: Genetic drift simulation </font>
+
+<p align = "justify">
+<font size="4"> [Dylan Padilla](https://dylanpadilla.netlify.app/), August 2022.</font>
+</p>
+
+
+</p></p>
+
+School of Life Sciences, Arizona State University, Tempe, AZ 85287, USA.
+</p></p>
+
+
+
+```{r, echo = TRUE, warning = FALSE, comment = " ", fig.align = "center", fig.height = 7, fig.width = 7, dpi = 300}
+
+alleles <- c("A", "B")
+
+Ne <- c(85, 64, 48, 34, 22, 60, 46, 38, 24, 10)
+
+matrix <- data.frame(gen = 1:10, pop = Ne, FreqA = NA, FreqB = NA)
+
+for(row in 1:nrow(matrix)){
+  a <- sample(alleles, size = matrix$pop[row], replace = T) # make random selection of alleles with replacement from a particular pop
+  fa <- sum(a == "A") / length(a) # find the frequency of allele A
+  fb <- 1 - fa # frequency of allele B
+  matrix$FreqA[row] <- fa # assign it back to the data.frame
+  matrix$FreqB[row] <- fb # assign it back to the data.frame
+
+  png(paste("img_", row, ".png")) # crating an animation
+  plot(rep(NA, 10), ylim = c(0, 1), ylab = "Allele frequency", xlab = "Generation", xaxt = "n")
+  axis(1, at = 1:10, labels = 1:10)
+  lines(matrix$FreqA ~ matrix$gen, data = matrix, type = "l", lwd = 3, col = "purple", ylim = c(0, 1), ylab = "Allele frequency", xlab = "Generation", xaxt = "n")
+  legend("topleft", legend = c("A", "B"), col = c("purple", "skyblue"), lwd = 3, bty = "n")
+  lines(matrix$FreqB ~ matrix$gen, data = matrix, lwd = 3, col = "skyblue")
+  dev.off()
+
+}
+
+
+
+## list file names and read in
+imgs <- list.files(path = "copy/directory/here", full.names = TRUE)
+img_list <- lapply(imgs, image_read)
+
+## join the images together
+img_joined <- image_join(img_list)
+
+## animate at 2 frames per second
+img_animated <- image_animate(img_joined, fps = 2)
+
+
+## save to disk
+image_write(image = img_animated,
+            path = "genetic-drift.gif")
+
+
+## view animated image
+img_animated
+
+```
